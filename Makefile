@@ -1,2 +1,2 @@
 run:
-	go run ./cmd/main.go
+	go run ./src/services/web/cmd/main.go
