@@ -1,0 +1,21 @@
+volumes:
+  pdf2vc-summarizer-volume:
+    name: pdf2vc-summarizer-volume
+
+services:
+  pdf2vc-summarizer:
+    container_name: pdf2vc-summarizer
+    image: pdf2vc-summarizer
+    build:
+      context: ./services/summarizer
+      dockerfile: Dockerfile
+    tty: true
+    volumes:
+      - pdf2vc-summarizer-volume:/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
