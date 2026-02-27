@@ -1,23 +1,28 @@
 package internal
 
 import (
+	"bytes"
 	"fmt"
 	"log"
-	"os"
+
+	"github.com/dslipak/pdf"
 )
 
 func ReadFile() {
-	dir, err := os.Getwd()
+	// Opens a PDF file and extracts text to a reader
+	r, err := pdf.Open("example.pdf")
 	if err != nil {
-		// Log the error and exit if getting the directory fails
 		log.Fatal(err)
 	}
-	// Print the working directory
-	fmt.Println(dir)
 
-	content, err := os.ReadFile("./example.pdf") // Use os.ReadFile as of Go 1.16+
+	// GetPlainText returns a reader containing the text
+	b, err := r.GetPlainText()
 	if err != nil {
-		log.Fatal(err) // Handle potential errors
+		log.Fatal(err)
 	}
-	fmt.Println(string(content))
+
+	// Read into a buffer to output
+	var buf bytes.Buffer
+	buf.ReadFrom(b)
+	fmt.Println(buf.String())
 }
