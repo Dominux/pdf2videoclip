@@ -1,5 +1,5 @@
 # Downloading model files
-if [ -d "/models/model.gguf" ]; then
+if [ -f "/models/model.gguf" ]; then
   echo "Model file already exists"
 else
   echo "Downloading model"
