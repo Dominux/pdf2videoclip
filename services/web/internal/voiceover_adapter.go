@@ -4,6 +4,7 @@ import (
 	"app/internal/common"
 	"fmt"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"unicode"
@@ -39,14 +40,29 @@ func (s *VoiceoverAdapter) prepareText() {
 	text = strings.ToLower(text)
 
 	// dividing into "sentences"
-	sentences := regexp.MustCompile(`[,.?!]\s*`).Split(text, -1)
+	type Entry struct {
+		sentence string
+		endMark  rune
+	}
+	sentences := []Entry{}
+	{
+		runes := []rune{}
+		for _, char := range text {
+			if slices.Contains([]rune{',', '.', '!', '?'}, char) {
+				sentences = append(sentences, Entry{string(runes), char})
+				runes = []rune{}
+			} else {
+				runes = append(runes, char)
+			}
+		}
+	}
 
 	newSentences := []string{}
-	for _, s := range sentences {
+	for _, entry := range sentences {
 		newWords := []string{}
 
-		// diving into words
-		for _, w := range strings.Split(s, " ") {
+		// dividing into words
+		for _, w := range strings.Split(entry.sentence, " ") {
 			if w == "" {
 				continue
 			}
@@ -55,11 +71,11 @@ func (s *VoiceoverAdapter) prepareText() {
 			newWords = append(newWords, word)
 		}
 
-		newSentence := "<s>" + strings.Join(newWords, " ") + "</s>"
+		newSentence := strings.Join(newWords, " ") + string(entry.endMark) + " "
 		newSentences = append(newSentences, newSentence)
 	}
 
-	s.text = "<speech>" + strings.Join(newSentences, "") + "</speech>"
+	s.text = strings.Join(newSentences, "")
 }
 
 func russifyWord(word string) string {
