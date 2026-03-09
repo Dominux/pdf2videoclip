@@ -1,28 +1,42 @@
 volumes:
   pdf2vc-summarizer-volume:
     name: pdf2vc-summarizer-volume
+  pdf2vc-transcriber-volume:
+    name: pdf2vc-transcriber-volume
 
 services:
-  pdf2vc-summarizer:
-    container_name: pdf2vc-summarizer
-    image: pdf2vc-summarizer
+  # pdf2vc-summarizer:
+  #   container_name: pdf2vc-summarizer
+  #   image: pdf2vc-summarizer
+  #   build:
+  #     context: ./services/summarizer
+  #     dockerfile: Dockerfile
+  #   tty: true
+  #   volumes:
+  #     - pdf2vc-summarizer-volume:/models
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
+
+  # pdf2vc-voiceover:
+  #   container_name: pdf2vc-voiceover
+  #   image: twirapp/silero-tts-api-server
+  #   tty: true
+  #   ports:
+  #     - 8000:8000
+
+  pdf2vc-transcriber:
+    container_name: pdf2vc-transcriber
+    image: pdf2vc-transcriber
     build:
-      context: ./services/summarizer
+      context: ./services/transcriber
       dockerfile: Dockerfile
     tty: true
     volumes:
-      - pdf2vc-summarizer-volume:/models
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-
-  pdf2vc-voiceover:
-    container_name: pdf2vc-voiceover
-    image: twirapp/silero-tts-api-server
-    tty: true
+      - pdf2vc-transcriber-volume:/model
     ports:
-      - 8000:8000
+      - 8001:8000
