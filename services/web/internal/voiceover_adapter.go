@@ -32,7 +32,14 @@ func newVoiceoverAdapter(text string) VoiceoverAdapter {
 	return VoiceoverAdapter{text}
 }
 
-func (s *VoiceoverAdapter) prepareText() {
+func (s *VoiceoverAdapter) generateVoice() {
+	// chunks := s.prepareText()
+	// for _, chunk := range chunks {
+
+	// }
+}
+
+func (s *VoiceoverAdapter) prepareText() []string {
 	// making text one line
 	text := regexp.MustCompile(`[^\S ]+`).ReplaceAllString(s.text, " ")
 
@@ -75,7 +82,22 @@ func (s *VoiceoverAdapter) prepareText() {
 		newSentences = append(newSentences, newSentence)
 	}
 
-	s.text = strings.Join(newSentences, "")
+	// converting to chunks cuz of the voiceover limitation
+	chunks := []string{}
+	newChunk := ""
+	for _, sentence := range newSentences {
+		if len(newChunk)+len(sentence) >= 900 {
+			chunks = append(chunks, newChunk)
+			newChunk = ""
+		}
+
+		newChunk += sentence
+	}
+	if newChunk != "" {
+		chunks = append(chunks, newChunk)
+	}
+
+	return chunks
 }
 
 func russifyWord(word string) string {
