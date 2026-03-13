@@ -52,5 +52,8 @@ func ReadFile() {
 	// fmt.Println(buf.String())
 
 	summarizerAdapter := newSummarizerAdapter()
-	summarizerAdapter.generate(buf.String())
+	summarizedText := summarizerAdapter.generate(buf.String())
+
+	voiceoverAdapter := newVoiceoverAdapter(summarizedText)
+	voiceoverAdapter.generateVoice()
 }

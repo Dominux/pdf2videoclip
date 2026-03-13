@@ -24,12 +24,12 @@ services:
               count: 1
               capabilities: [gpu]
 
-  # pdf2vc-voiceover:
-  #   container_name: pdf2vc-voiceover
-  #   image: twirapp/silero-tts-api-server
-  #   tty: true
-  #   ports:
-  #     - 8000:8000
+  pdf2vc-voiceover:
+    container_name: pdf2vc-voiceover
+    image: twirapp/silero-tts-api-server
+    tty: true
+    ports:
+      - 8000:8000
 
   # pdf2vc-transcriber:
   #   container_name: pdf2vc-transcriber

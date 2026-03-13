@@ -3,12 +3,20 @@ package internal
 import (
 	"app/internal/common"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"net/url"
+	"os"
+	"os/exec"
 	"regexp"
 	"slices"
 	"strconv"
 	"strings"
 	"unicode"
 )
+
+const finalFilepath = "voice.wav"
 
 var (
 	translitRules = []string{
@@ -33,10 +41,76 @@ func newVoiceoverAdapter(text string) VoiceoverAdapter {
 }
 
 func (s *VoiceoverAdapter) generateVoice() {
-	// chunks := s.prepareText()
-	// for _, chunk := range chunks {
+	chunks := s.prepareText()
 
-	// }
+	// case for a single chunk
+	if len(chunks) == 1 {
+		if err := s.makeRequest(chunks[0], finalFilepath); err != nil {
+			panic(err)
+		}
+		return
+	}
+
+	for i, chunk := range chunks {
+		filename := strconv.Itoa(i) + ".wav"
+		if err := s.makeRequest(chunk, filename); err != nil {
+			panic(err)
+		}
+	}
+
+	// The full bash command as a string
+	script := `ffmpeg -f concat -safe 0 -i <(for f in *.wav; do echo "file '$PWD/$f'"; done) -c copy ` + finalFilepath
+
+	cmd := exec.Command("bash", "-c", script)
+	if err := cmd.Run(); err != nil {
+		panic(err)
+	}
+}
+
+func (s *VoiceoverAdapter) makeRequest(text string, filepath string) error {
+	apiUrl := "http://localhost:8000/generate"
+
+	// 1. Create url.Values and add your params
+	params := url.Values{}
+	params.Add("text", text)
+	params.Add("speaker", "aidar")
+
+	// 2. Parse the base URL and attach the encoded query
+	fullUrl, _ := url.Parse(apiUrl)
+	fullUrl.RawQuery = params.Encode()
+
+	logger := log.Default()
+	logger.Println("Before Voiceover request")
+
+	resp, err := http.Get(fullUrl.String())
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	logger.Println("After Voiceover request")
+
+	// 2. Check if the server actually sent a file (200 OK)
+	if resp.StatusCode != http.StatusOK {
+		panic("failed to download file: " + resp.Status)
+	}
+
+	// 2. Create the local file
+	out, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	// Ensure the file is closed after the copy operation
+	defer out.Close()
+
+	// 3. Use io.Copy to stream data from the response body to the file
+	// The response body (resp.Body) is an io.Reader, and the file (out) is an io.Writer.
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *VoiceoverAdapter) prepareText() []string {

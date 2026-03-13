@@ -25,3 +25,5 @@ go.work.sum
 .env
 
 /services/web/example.pdf
+
+*.wav
