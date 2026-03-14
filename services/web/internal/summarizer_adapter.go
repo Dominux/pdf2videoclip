@@ -3,7 +3,6 @@ package internal
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -50,11 +49,6 @@ func (s *SummarizerAdapter) generate(text string) string {
 	if err := json.Unmarshal(bodyBytes, &response); err != nil {
 		log.Fatal(err)
 	}
-
-	bodyString := string(bodyBytes)
-	fmt.Println(bodyString)
-
-	fmt.Println("Response:", response.Response)
 
 	return response.Response
 }

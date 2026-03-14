@@ -56,4 +56,7 @@ func ReadFile() {
 
 	voiceoverAdapter := newVoiceoverAdapter(summarizedText)
 	voiceoverAdapter.generateVoice()
+
+	renderer := newRenderer(summarizedText)
+	renderer.render()
 }
