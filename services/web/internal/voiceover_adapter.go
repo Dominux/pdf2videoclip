@@ -74,6 +74,8 @@ func (s *VoiceoverAdapter) makeRequest(text string, filepath string) error {
 	params := url.Values{}
 	params.Add("text", text)
 	params.Add("speaker", "aidar")
+	params.Add("pitch", "40")
+	params.Add("rate", "55")
 
 	// 2. Parse the base URL and attach the encoded query
 	fullUrl, _ := url.Parse(apiUrl)

@@ -49,7 +49,6 @@ func ReadFile() {
 	// Read into a buffer to output
 	var buf bytes.Buffer
 	buf.ReadFrom(b)
-	// fmt.Println(buf.String())
 
 	summarizerAdapter := newSummarizerAdapter()
 	summarizedText := summarizerAdapter.generate(buf.String())

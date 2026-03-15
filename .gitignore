@@ -27,3 +27,4 @@ go.work.sum
 /services/web/example.pdf
 
 *.wav
+*.mp4
